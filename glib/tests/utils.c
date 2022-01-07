@@ -916,6 +916,44 @@ test_misc_mem (void)
 }
 
 static void
+aligned_alloc_npot (void)
+{
+  gpointer a;
+
+  a = g_aligned_alloc (16, sizeof(char), 15);
+  g_assert_null (a);
+  exit (0);
+}
+
+static void
+test_aligned_mem (void)
+{
+  gpointer a;
+
+  g_test_summary ("Aligned memory allocator");
+
+  a = g_aligned_alloc (0, sizeof(int), 8);
+  g_assert_null (a);
+
+  a = g_aligned_alloc0 (0, sizeof(int), 8);
+  g_assert_null (a);
+
+  a = g_aligned_alloc (16, 0, 8);
+  g_assert_null (a);
+
+#define CHECK_SUBPROCESS_FAIL(name,msg) do { \
+      if (g_test_undefined ()) \
+        { \
+          g_test_message (msg); \
+          g_test_trap_subprocess ("/utils/aligned-mem/subprocess/" #name, 0, 0); \
+          g_test_trap_assert_failed (); \
+        } \
+    } while (0)
+
+  CHECK_SUBPROCESS_FAIL (aligned_alloc_npot, "Alignment must be a power of two");
+}
+
+static void
 test_nullify (void)
 {
   gpointer p = &test_nullify;
@@ -1084,6 +1122,8 @@ main (int   argc,
   g_test_add_func ("/utils/take-pointer", test_take_pointer);
   g_test_add_func ("/utils/clear-source", test_clear_source);
   g_test_add_func ("/utils/misc-mem", test_misc_mem);
+  g_test_add_func ("/utils/aligned-mem", test_aligned_mem);
+  g_test_add_func ("/utils/aligned-mem/subprocess/aligned_alloc_npot", aligned_alloc_npot);
   g_test_add_func ("/utils/nullify", test_nullify);
   g_test_add_func ("/utils/atexit", test_atexit);
   g_test_add_func ("/utils/check-setuid", test_check_setuid);
