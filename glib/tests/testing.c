@@ -1682,7 +1682,7 @@ main (int   argc,
   g_test_add_func ("/tap", test_tap);
   g_test_add_func ("/tap/summary", test_tap_summary);
 
-  ret = g_test_run();
+  ret = g_test_run ();
 
   /* We can't test for https://gitlab.gnome.org/GNOME/glib/-/issues/2563
    * from a test-case, because the whole point of that issue is that it's
